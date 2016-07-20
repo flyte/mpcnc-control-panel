@@ -16,6 +16,9 @@ rear_panel_thickness = 6;
 screw_diameter = 8;
 screw_pitch = 2;
 
+fan_diameter = 30;
+fan_screw_diameter = 4;
+
 module screw_hole(width, height, depth, diameter) {
     difference() {
         cube([width, height, depth]);
@@ -52,6 +55,21 @@ module screw_hole_angle(width, height, depth, diameter) {
     }
 }
 
+module fan_hole(fan_diameter, fan_screw_diameter) {
+    hole_diameter = fan_diameter*0.93;
+    screw_hole_distance = fan_diameter*0.8;
+    cylinder(r=hole_diameter/2, h=thickness+(nudge*2));
+    translate([screw_hole_distance/2, screw_hole_distance/2, 0])
+        cylinder(r=fan_screw_diameter/2, h=thickness+(nudge*2));
+    translate([-screw_hole_distance/2, screw_hole_distance/2, 0])
+        cylinder(r=fan_screw_diameter/2, h=thickness+(nudge*2));
+    translate([screw_hole_distance/2, -screw_hole_distance/2, 0])
+        cylinder(r=fan_screw_diameter/2, h=thickness+(nudge*2));
+    translate([-screw_hole_distance/2, -screw_hole_distance/2, 0])
+        cylinder(r=fan_screw_diameter/2, h=thickness+(nudge*2));
+}
+
+
 difference() {
     hull() {
         // Front
@@ -62,6 +80,15 @@ difference() {
     }
     translate([thickness, thickness, thickness])
         cube([width-(thickness*2), height, rear_depth]);
+
+    // Fan holes
+    translate([-nudge, height/1.6, rear_depth/3.5]) {
+        rotate([0, 90, 0])
+            fan_hole(fan_diameter, fan_screw_diameter);
+        translate([width-thickness, 0, 0])
+            rotate([0, 90, 0])
+                fan_hole(fan_diameter, fan_screw_diameter);
+    }
 }
 
 standoff_size = 10;
