@@ -1,3 +1,9 @@
+include <threads.scad>;
+
+quick_render = true;
+
+nudge = 0.01;
+
 width = 160;  // X axis
 height = 120;  // Y axis
 rear_depth = 100;  // Z axis
@@ -5,25 +11,45 @@ front_depth = rear_depth/2.5;
 surface_angle = atan2(rear_depth-front_depth, height);
 thickness = 2;
 front_panel_thickness = 6;
+rear_panel_thickness = 6;
+
+screw_diameter = 8;
+screw_pitch = 2;
 
 module screw_hole(width, height, depth, diameter) {
     difference() {
         cube([width, height, depth]);
-        translate([width/2, height/2, depth/5])
-            cylinder(r=diameter/2, h=depth, $fs=0.01);
+        translate([width/2, height/2, -nudge]) {
+            if (quick_render) {
+                cylinder(r=screw_diameter/2, depth+(nudge*2));
+            } else {
+                metric_thread(screw_diameter, screw_pitch, depth+(nudge*2), internal=true);
+            }
+        }
     }
 }
 
 module screw_hole_angle(width, height, depth, diameter) {
-    screw_hole(width, height, depth, diameter);
-    rotate([90, 0, 0])
-        translate([0, 0, -height])
-            linear_extrude(height=height)
-                polygon(points=[
-                    [0, 0],
-                    [width, 0],
-                    [0, -depth]
-                ]);
+    difference() {
+        union() {
+            cube([width, height, depth]);
+            rotate([90, 0, 0])
+                translate([0, 0, -height])
+                    linear_extrude(height=height)
+                        polygon(points=[
+                            [0, 0],
+                            [width, 0],
+                            [0, -depth]
+                        ]);
+        }
+        translate([width/2, height/2, -depth/1.1]) {
+            if (quick_render) {
+                cylinder(r=screw_diameter/2, depth*2);
+            } else {
+                metric_thread(screw_diameter, screw_pitch, depth*2, internal=true);
+            }
+        }
+    }
 }
 
 difference() {
@@ -45,6 +71,8 @@ echo("Front panel holes X: ", front_panel_holes_x);
 front_panel_holes_y = (height*0.75)-standoff_size;
 echo("Front panel holes Y: ", front_panel_holes_y);
 
+
+// Screw standoffs for front panel
 translate([thickness, thickness, front_depth+front_inside_depth]) {
     rotate([surface_angle, 0, 0]) translate([0, 0, -standoff_size-front_panel_thickness]) {
         screw_hole_angle(standoff_size, standoff_size, standoff_size, 4);
@@ -56,5 +84,21 @@ translate([thickness, thickness, front_depth+front_inside_depth]) {
         translate([width-(thickness*2)-standoff_size, height*0.75, 0])
             rotate([0, 0, 180]) translate([-standoff_size, -standoff_size, 0])
                 screw_hole_angle(standoff_size, standoff_size, standoff_size, 4);
+    }
+}
+
+slot_x_thickness = 2;
+slot_y_thickness = 1;
+rear_slot_tolerance = 0.2;
+
+// Mounting for rear panel
+translate([thickness, 1+height-slot_y_thickness, thickness]) {
+    cube([slot_x_thickness, slot_y_thickness, rear_depth*0.75]);
+    translate([0, -rear_panel_thickness-slot_y_thickness-rear_slot_tolerance, 0])
+        cube([slot_x_thickness, slot_y_thickness, rear_depth*0.75]);
+    translate([width-(thickness*2)-slot_x_thickness, 0, 0]) {
+        cube([slot_x_thickness, slot_y_thickness, rear_depth*0.75]);
+        translate([0, -rear_panel_thickness-slot_y_thickness-rear_slot_tolerance, 0])
+            cube([slot_x_thickness, slot_y_thickness, rear_depth*0.75]);
     }
 }
