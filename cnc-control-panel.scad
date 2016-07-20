@@ -89,6 +89,10 @@ difference() {
             rotate([0, 90, 0])
                 fan_hole(fan_diameter, fan_screw_diameter);
     }
+
+    // Plastic savings
+    translate([thickness+10, 10, -nudge])
+        cube([width-20-thickness*2, height-20, thickness+(nudge*2)]);
 }
 
 standoff_size = 10;
