@@ -1,12 +1,12 @@
-include <threads.scad>;
+include <ISOThread.scad>;
 
-thread_length = 20;
-thread_diameter = 8;
-thread_pitch = 2;
+length = 16;
+diameter = 8;
 
-head_length = 5;
-head_diameter = 7;
+// difference() {
+//     hex_bolt(8, 16);
+//     translate([0, 0, 19.4])
+//         cylinder(r=8, h=2);
+// }
 
-cylinder(r=head_diameter, h=head_length, $fs=8);
-translate([0, 0, head_length])
-    metric_thread(thread_diameter, thread_pitch, thread_length);
+hex_bolt(diameter, length);
