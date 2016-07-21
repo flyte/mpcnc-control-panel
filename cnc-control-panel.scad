@@ -1,5 +1,7 @@
 include <ISOThread.scad>;
 
+quick_render = true;
+
 nudge = 0.01;
 
 width = 160;  // X axis
@@ -16,13 +18,17 @@ screw_diameter = 8;
 fan_diameter = 30;
 fan_screw_diameter = 4;
 
+base_surround_width = 10;
+
 module screw_hole(width, height, depth, diameter) {
     difference() {
         cube([width, height, depth]);
         translate([width/2, height/2, -nudge]) {
             difference() {
                 cylinder(r=screw_diameter/2, depth+(nudge*2));
-                thread_in(screw_diameter, depth+(nudge*2));
+                if (!quick_render) {
+                    thread_in(screw_diameter, depth+(nudge*2));
+                }
             }
         }
     }
@@ -44,7 +50,9 @@ module screw_hole_angle(width, height, depth, diameter) {
         translate([width/2, height/2, -depth/1.1])
             difference() {
                 cylinder(r=diameter/2, depth*2);
-                thread_in(diameter, depth*2);
+                if (!quick_render) {
+                    thread_in(diameter, depth*2);
+                }
             }
     }
 }
@@ -85,8 +93,8 @@ difference() {
     }
 
     // Plastic savings
-    translate([thickness+10, 10, -nudge])
-        cube([width-20-thickness*2, height-20, thickness+(nudge*2)]);
+    translate([thickness+base_surround_width, base_surround_width, -nudge])
+        cube([width-(base_surround_width*2)-thickness*2, height-(base_surround_width*2), thickness+(nudge*2)]);
 }
 
 standoff_size = 10;
@@ -126,4 +134,41 @@ translate([thickness, 1+height-slot_y_thickness, thickness]) {
         translate([0, -rear_panel_thickness-slot_y_thickness-rear_slot_tolerance, 0])
             cube([slot_x_thickness, slot_y_thickness, rear_depth*0.75]);
     }
+}
+
+usb_overhang = 6.25;
+pcb_width = 53.3;
+pcb_height = 68.6;
+pcb_rear_overhang = pcb_height-50.8-1.3-14;
+
+bl_hole_x = 2.5+5.1;
+bl_hole_y = pcb_rear_overhang;
+br_hole_x = bl_hole_x+27.9;
+br_hole_y = pcb_rear_overhang;
+tr_hole_x = br_hole_x+15.2;
+tr_hole_y = br_hole_y+50.8;
+tl_hole_x = 2.5;
+tl_hole_y = tr_hole_y+1.3;
+hole_diameter = 3;
+pole_height = 8;
+arduino_surround_width = 8;
+
+// Position of the inside of the rear panel
+inside_y = height-slot_y_thickness-rear_panel_thickness-rear_slot_tolerance;
+
+// Mounting for Arduino
+translate([width-pcb_width-30, inside_y-pcb_height, 0]) {
+    difference() {
+        cube([pcb_width, pcb_height, thickness]);
+        translate([arduino_surround_width, arduino_surround_width, -nudge])
+            cube([pcb_width-(arduino_surround_width*2), pcb_height-arduino_surround_width, thickness+(nudge*2)]);
+    }
+    translate([bl_hole_x, bl_hole_y, thickness])
+        cylinder(r=hole_diameter/2, h=pole_height);
+    translate([br_hole_x, br_hole_y, thickness])
+        cylinder(r=hole_diameter/2, h=pole_height);
+    translate([tl_hole_x, tl_hole_y, thickness])
+        cylinder(r=hole_diameter/2, h=pole_height);
+    translate([tr_hole_x, tr_hole_y, thickness])
+        cylinder(r=hole_diameter/2, h=pole_height);
 }
