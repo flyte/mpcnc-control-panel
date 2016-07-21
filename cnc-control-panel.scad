@@ -1,6 +1,4 @@
-include <threads.scad>;
-
-quick_render = true;
+include <ISOThread.scad>;
 
 nudge = 0.01;
 
@@ -14,7 +12,6 @@ front_panel_thickness = 6;
 rear_panel_thickness = 6;
 
 screw_diameter = 8;
-screw_pitch = 2;
 
 fan_diameter = 30;
 fan_screw_diameter = 4;
@@ -23,10 +20,9 @@ module screw_hole(width, height, depth, diameter) {
     difference() {
         cube([width, height, depth]);
         translate([width/2, height/2, -nudge]) {
-            if (quick_render) {
+            difference() {
                 cylinder(r=screw_diameter/2, depth+(nudge*2));
-            } else {
-                metric_thread(screw_diameter, screw_pitch, depth+(nudge*2), internal=true);
+                thread_in(screw_diameter, depth+(nudge*2));
             }
         }
     }
@@ -45,13 +41,11 @@ module screw_hole_angle(width, height, depth, diameter) {
                             [0, -depth]
                         ]);
         }
-        translate([width/2, height/2, -depth/1.1]) {
-            if (quick_render) {
-                cylinder(r=screw_diameter/2, depth*2);
-            } else {
-                metric_thread(screw_diameter, screw_pitch, depth*2, internal=true);
+        translate([width/2, height/2, -depth/1.1])
+            difference() {
+                cylinder(r=diameter/2, depth*2);
+                thread_in(diameter, depth*2);
             }
-        }
     }
 }
 
@@ -106,15 +100,15 @@ echo("Front panel holes Y: ", front_panel_holes_y);
 // Screw standoffs for front panel
 translate([thickness, thickness, front_depth+front_inside_depth]) {
     rotate([surface_angle, 0, 0]) translate([0, 0, -standoff_size-front_panel_thickness]) {
-        screw_hole_angle(standoff_size, standoff_size, standoff_size, 4);
+        screw_hole_angle(standoff_size, standoff_size, standoff_size, screw_diameter);
         translate([0, height*0.75, 0])
-            screw_hole_angle(standoff_size, standoff_size, standoff_size, 4);
+            screw_hole_angle(standoff_size, standoff_size, standoff_size, screw_diameter);
         translate([width-(thickness*2)-standoff_size, 0, 0])
             rotate([0, 0, 180]) translate([-standoff_size, -standoff_size, 0])
-                screw_hole_angle(standoff_size, standoff_size, standoff_size, 4);
+                screw_hole_angle(standoff_size, standoff_size, standoff_size, screw_diameter);
         translate([width-(thickness*2)-standoff_size, height*0.75, 0])
             rotate([0, 0, 180]) translate([-standoff_size, -standoff_size, 0])
-                screw_hole_angle(standoff_size, standoff_size, standoff_size, 4);
+                screw_hole_angle(standoff_size, standoff_size, standoff_size, screw_diameter);
     }
 }
 
