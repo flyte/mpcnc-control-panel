@@ -151,17 +151,17 @@ tl_hole_x = 2.5;
 tl_hole_y = tr_hole_y+1.3;
 hole_diameter = 3;
 pole_height = 8;
-arduino_surround_width = 8;
+mountings_width = 8;
 
 // Position of the inside of the rear panel
 inside_y = height-slot_y_thickness-rear_panel_thickness-rear_slot_tolerance;
 
-// Mounting for Arduino
-translate([width-pcb_width-30, inside_y-pcb_height, 0]) {
+// Mounting for Arduino Uno
+translate([width-pcb_width-25, inside_y-pcb_height, 0]) {
     difference() {
         cube([pcb_width, pcb_height, thickness]);
-        translate([arduino_surround_width, arduino_surround_width, -nudge])
-            cube([pcb_width-(arduino_surround_width*2), pcb_height-arduino_surround_width, thickness+(nudge*2)]);
+        translate([mountings_width, mountings_width, -nudge])
+            cube([pcb_width-(mountings_width*2), pcb_height-mountings_width, thickness+(nudge*2)]);
     }
     translate([bl_hole_x, bl_hole_y, thickness])
         cylinder(r=hole_diameter/2, h=pole_height);
@@ -171,4 +171,30 @@ translate([width-pcb_width-30, inside_y-pcb_height, 0]) {
         cylinder(r=hole_diameter/2, h=pole_height);
     translate([tr_hole_x, tr_hole_y, thickness])
         cylinder(r=hole_diameter/2, h=pole_height);
+}
+translate([width-pcb_width-25+(pcb_width/2)-(mountings_width/2), base_surround_width, 0])
+    cube([base_surround_width, height-pcb_height-base_surround_width, thickness]);
+
+relay_width = 45;
+relay_height = 60;
+bottom_hole_y = 6;
+top_hole_y = relay_height-7;
+relay_pole_diameter = 4.2;
+relay_pole_height = 6;
+
+// Mounting for solid state relay (SSR-25-DA)
+translate([40, base_surround_width, 0]) {
+    cube([mountings_width, height-(base_surround_width*2), thickness]);
+    translate([-(relay_width/2)+(mountings_width/2), height/2-base_surround_width-(relay_height/2), 0])
+        difference() {
+            cube([relay_width, relay_height, thickness]);
+            translate([mountings_width, mountings_width, -nudge])
+                cube([relay_width-(mountings_width*2), relay_height-(mountings_width*2), thickness+(nudge*2)]);
+        }
+    translate([mountings_width/2, height/2-base_surround_width-(relay_height/2), thickness]) {
+        translate([0, bottom_hole_y, 0])
+            cylinder(r=relay_pole_diameter/2, h=relay_pole_height);
+        translate([0, top_hole_y, 0])
+            cylinder(r=relay_pole_diameter/2, h=relay_pole_height);
+    }
 }
