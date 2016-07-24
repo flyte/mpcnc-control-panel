@@ -1,6 +1,6 @@
-include <ISOThread.scad>;
+include <Nut_Job.scad>;
 
-quick_render = true;
+quick_render = false;
 
 nudge = 0.01;
 
@@ -14,6 +14,8 @@ front_panel_thickness = 6;
 rear_panel_thickness = 6;
 
 screw_diameter = 8;
+screw_pitch = 2;
+screw_shape_degs = 45;
 
 fan_diameter = 30;
 fan_screw_diameter = 4;
@@ -24,12 +26,7 @@ module screw_hole(width, height, depth, diameter) {
     difference() {
         cube([width, height, depth]);
         translate([width/2, height/2, -nudge]) {
-            difference() {
-                cylinder(r=screw_diameter/2, depth+(nudge*2));
-                if (!quick_render) {
-                    thread_in(screw_diameter, depth+(nudge*2));
-                }
-            }
+            screw_thread(screw_diameter, screw_pitch, screw_shape_degs, depth+(nudge*2), 0.5);
         }
     }
 }
@@ -48,12 +45,7 @@ module screw_hole_angle(width, height, depth, diameter) {
                         ]);
         }
         translate([width/2, height/2, -depth/1.1])
-            difference() {
-                cylinder(r=diameter/2, depth*2);
-                if (!quick_render) {
-                    thread_in(diameter, depth*2);
-                }
-            }
+            screw_thread(screw_diameter, screw_pitch, screw_shape_degs, depth*2, 0.5);
     }
 }
 
