@@ -26,7 +26,7 @@ module screw_hole(width, height, depth, diameter) {
     difference() {
         cube([width, height, depth]);
         translate([width/2, height/2, -nudge]) {
-            screw_thread(screw_diameter, screw_pitch, screw_shape_degs, depth+(nudge*2), 0.5);
+            screw_thread(screw_diameter+1, screw_pitch, screw_shape_degs, depth+(nudge*2), 0.5);
         }
     }
 }
@@ -45,7 +45,7 @@ module screw_hole_angle(width, height, depth, diameter) {
                         ]);
         }
         translate([width/2, height/2, -depth/1.1])
-            screw_thread(screw_diameter, screw_pitch, screw_shape_degs, depth*2, 0.5);
+            screw_thread(screw_diameter+1, screw_pitch, screw_shape_degs, depth*2, 0.5);
     }
 }
 
