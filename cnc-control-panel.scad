@@ -49,6 +49,8 @@ module screw_hole_angle(width, height, depth, diameter) {
     }
 }
 
+
+
 module fan_hole(fan_diameter, fan_screw_diameter) {
     hole_diameter = fan_diameter*0.93;
     screw_hole_distance = fan_diameter*0.8;
@@ -76,7 +78,7 @@ difference() {
         cube([width-(thickness*2), height, rear_depth]);
 
     // Fan holes
-    translate([-nudge, height/1.6, rear_depth/3.5]) {
+    translate([-nudge, height/1.6, rear_depth/4]) {
         rotate([0, 90, 0])
             fan_hole(fan_diameter, fan_screw_diameter);
         translate([width-thickness, 0, 0])
@@ -97,9 +99,9 @@ front_panel_holes_y = (height*0.75)-standoff_size;
 echo("Front panel holes Y: ", front_panel_holes_y);
 
 
-// Screw standoffs for front panel
 translate([thickness, thickness, front_depth+front_inside_depth]) {
     rotate([surface_angle, 0, 0]) translate([0, 0, -standoff_size-front_panel_thickness]) {
+        // Screw standoffs for front panel
         screw_hole_angle(standoff_size, standoff_size, standoff_size, screw_diameter);
         translate([0, height*0.75, 0])
             screw_hole_angle(standoff_size, standoff_size, standoff_size, screw_diameter);
@@ -109,6 +111,35 @@ translate([thickness, thickness, front_depth+front_inside_depth]) {
         translate([width-(thickness*2)-standoff_size, height*0.75, 0])
             rotate([0, 0, 180]) translate([-standoff_size, -standoff_size, 0])
                 screw_hole_angle(standoff_size, standoff_size, standoff_size, screw_diameter);
+
+        // Lip for the front panel to sit on
+        translate([0, height/4, 0]) {
+            // LHS
+            cube([standoff_size, height/3, standoff_size]);
+            rotate([90, 0, 0])
+                translate([0, 0, -height/3])
+                    linear_extrude(height=height/3)
+                        polygon(points=[
+                            [0, 0],
+                            [standoff_size, 0],
+                            [0, -standoff_size]
+                        ]);
+
+            // RHS
+            translate([width-(thickness*2), height/3, 0]) {
+                rotate([0, 0, 180]) {
+                    cube([standoff_size, height/3, standoff_size]);
+                    rotate([90, 0, 0])
+                        translate([0, 0, -height/3])
+                            linear_extrude(height=height/3)
+                                polygon(points=[
+                                    [0, 0],
+                                    [standoff_size, 0],
+                                    [0, -standoff_size]
+                                ]);
+                }
+            }
+        }
     }
 }
 
